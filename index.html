@@ -50,7 +50,7 @@
       filter: saturate(0.95);
     }
 
-    /* ダメージ演出 */
+    /* オーバー時のダメージ演出 */
     .damage-overlay {
       position: fixed;
       inset: 0;
@@ -99,6 +99,63 @@
       100% { transform: translate(0, 0); }
     }
 
+    /* オーバー後ポップアップ */
+    .over-popup {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .over-popup.show {
+      display: flex;
+    }
+
+    .over-popup-card {
+      background: rgba(255, 255, 255, 0.96);
+      border: 5px solid #e53935;
+      border-radius: 28px;
+      padding: 28px 34px;
+      box-shadow: 0 14px 36px rgba(0,0,0,0.22);
+      animation: overPop 1.1s ease forwards;
+    }
+
+    .over-popup-title {
+      font-size: 42px;
+      font-weight: 950;
+      color: #e53935;
+      line-height: 1.1;
+    }
+
+    .over-popup-text {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 900;
+      color: #263128;
+    }
+
+    @keyframes overPop {
+      0% {
+        transform: scale(0.6) rotate(-5deg);
+        opacity: 0;
+      }
+      20% {
+        transform: scale(1.12) rotate(3deg);
+        opacity: 1;
+      }
+      70% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+    }
+
     .screen {
       display: none;
       min-height: 100vh;
@@ -111,8 +168,8 @@
     }
 
     h1 {
-      margin-top: 28px;
-      font-size: 34px;
+      margin-top: 20px;
+      font-size: 32px;
       line-height: 1.1;
       letter-spacing: -0.5px;
       position: relative;
@@ -129,11 +186,11 @@
 
     .card {
       background: rgba(255, 255, 255, 0.9);
-      border-radius: 28px;
-      padding: 24px;
-      margin: 20px auto;
-      max-width: 430px;
-      box-shadow: 0 10px 26px rgba(0,0,0,0.13);
+      border-radius: 24px;
+      padding: 18px;
+      margin: 14px auto;
+      max-width: 400px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
       border: 3px solid rgba(255,255,255,0.85);
       position: relative;
       z-index: 1;
@@ -176,6 +233,7 @@
       box-shadow: 0 1px 0 rgba(0,0,0,0.16);
     }
 
+    /* 固定スコアヘッダー */
     .fixed-score-header {
       position: sticky;
       top: 0;
@@ -183,16 +241,16 @@
       background: rgba(244, 241, 232, 0.78);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      padding: 10px 8px 12px;
-      margin: -22px -22px 12px;
+      padding: 8px 8px 10px;
+      margin: -22px -22px 10px;
       box-shadow: 0 5px 16px rgba(0,0,0,0.1);
     }
 
     .fixed-score-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 900;
       opacity: 0.7;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .fixed-score-row {
@@ -209,9 +267,9 @@
     }
 
     .fixed-score-item {
-      min-width: 92px;
-      border-radius: 18px;
-      padding: 8px 10px;
+      min-width: 86px;
+      border-radius: 17px;
+      padding: 7px 9px;
       font-weight: 900;
       box-shadow: 0 3px 8px rgba(0,0,0,0.1);
       border: 3px solid currentColor;
@@ -221,12 +279,12 @@
     }
 
     .fixed-score-name {
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.1;
     }
 
     .fixed-score-point {
-      font-size: 27px;
+      font-size: 25px;
       line-height: 1;
       margin-top: 4px;
     }
@@ -237,11 +295,11 @@
     }
 
     .icon-button {
-      width: 58px;
-      height: 58px;
+      width: 52px;
+      height: 52px;
       padding: 0;
       border-radius: 50%;
-      font-size: 28px;
+      font-size: 25px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -251,8 +309,8 @@
     }
 
     .top-actions {
-      max-width: 430px;
-      margin: -6px auto 8px;
+      max-width: 400px;
+      margin: -4px auto 6px;
       display: flex;
       justify-content: flex-end;
       gap: 8px;
@@ -261,43 +319,44 @@
     }
 
     .team-name {
-      font-size: 38px;
+      font-size: 30px;
       font-weight: 900;
-      margin: 10px 0;
+      margin: 8px 0;
     }
 
     .score {
-      font-size: 82px;
+      font-size: 62px;
       font-weight: 950;
-      margin: 4px 0 8px;
+      margin: 2px 0 8px;
       line-height: 1;
     }
 
     .target {
       display: inline-block;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: 999px;
       background: #f1f4ed;
       font-weight: 700;
+      font-size: 15px;
     }
 
     .score-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      max-width: 430px;
-      margin: 22px auto;
+      gap: 10px;
+      max-width: 380px;
+      margin: 14px auto;
       position: relative;
       z-index: 1;
     }
 
     .score-buttons button {
-      width: 74px;
-      height: 74px;
+      width: 62px;
+      height: 62px;
       border-radius: 50%;
       margin: 0 auto;
       padding: 0;
-      font-size: 25px;
+      font-size: 23px;
       background: rgba(255,255,255,0.96);
       color: #263128;
       border: 4px solid currentColor;
@@ -305,61 +364,12 @@
     }
 
     .status {
-      font-size: 19px;
-      margin-top: 12px;
-      min-height: 30px;
+      font-size: 17px;
+      margin-top: 8px;
+      min-height: 24px;
       font-weight: 800;
       position: relative;
       z-index: 1;
-    }
-
-    table {
-      width: 100%;
-      max-width: 430px;
-      margin: 20px auto;
-      border-collapse: separate;
-      border-spacing: 0 9px;
-      position: relative;
-      z-index: 1;
-    }
-
-    th {
-      font-size: 15px;
-      opacity: 0.7;
-      padding: 6px;
-    }
-
-    td {
-      padding: 13px;
-      font-size: 19px;
-      background: rgba(255,255,255,0.9);
-      font-weight: 800;
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-    }
-
-    td:first-child {
-      border-radius: 18px 0 0 18px;
-      text-align: left;
-    }
-
-    td:last-child {
-      border-radius: 0 18px 18px 0;
-      font-size: 24px;
-    }
-
-    .current-row td {
-      outline: 4px solid rgba(0,0,0,0.08);
-    }
-
-    .color-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 8px;
-      vertical-align: middle;
-      border: 2px solid rgba(0,0,0,0.15);
     }
 
     .team-card {
@@ -372,7 +382,7 @@
 
     @keyframes bump {
       0% { transform: scale(1); }
-      45% { transform: scale(1.06) rotate(-1deg); }
+      45% { transform: scale(1.04) rotate(-1deg); }
       100% { transform: scale(1); }
     }
 
@@ -418,24 +428,53 @@
 
     @media (max-width: 420px) {
       h1 {
-        font-size: 31px;
+        font-size: 29px;
+        margin-top: 16px;
       }
 
-      .score-buttons {
-        gap: 11px;
+      .card {
+        max-width: 360px;
+        padding: 16px;
+        margin: 12px auto;
       }
 
-      .score-buttons button {
-        width: 68px;
-        height: 68px;
+      .team-name {
+        font-size: 28px;
       }
 
       .score {
-        font-size: 76px;
+        font-size: 58px;
+      }
+
+      .score-buttons {
+        gap: 9px;
+        max-width: 340px;
+      }
+
+      .score-buttons button {
+        width: 58px;
+        height: 58px;
+        font-size: 22px;
       }
 
       .fixed-score-item {
-        min-width: 84px;
+        min-width: 80px;
+      }
+
+      .fixed-score-point {
+        font-size: 23px;
+      }
+
+      .over-popup-card {
+        padding: 24px 28px;
+      }
+
+      .over-popup-title {
+        font-size: 38px;
+      }
+
+      .over-popup-text {
+        font-size: 22px;
       }
     }
   </style>
@@ -444,6 +483,13 @@
 <body>
   <div id="bgPattern" class="bg-pattern" aria-hidden="true"></div>
   <div id="damageOverlay" class="damage-overlay"></div>
+
+  <div id="overPopup" class="over-popup">
+    <div class="over-popup-card">
+      <div class="over-popup-title">オーバー！</div>
+      <div class="over-popup-text">25点からスタート</div>
+    </div>
+  </div>
 
   <div id="appShell">
     <!-- 設定画面 -->
@@ -486,22 +532,12 @@
       <div id="teamCard" class="card team-card">
         <div id="currentTeam" class="team-name">チームA</div>
         <div id="currentScore" class="score">0</div>
-        <div id="targetText" class="target">目標：50点ぴったり</div>
+        <div id="targetText" class="target">目標：50点</div>
       </div>
 
       <div class="score-buttons" id="scoreButtons"></div>
 
       <div id="status" class="status"></div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>チーム</th>
-            <th>得点</th>
-          </tr>
-        </thead>
-        <tbody id="scoreTable"></tbody>
-      </table>
     </div>
 
     <!-- 勝利画面 -->
@@ -533,11 +569,10 @@
       { name: "緑", main: "#43a047", light: "#e5f6e8" }
     ];
 
-    /* 背景に使う画像。
-       GitHubに 1.png ～ 12.png を同じ階層へアップしてください。 */
     const bgImages = [
-      "1.png", "2.png", "3.png", "4.png", "5.png", "6.png",
-      "7.png", "8.png", "9.png", "10.png", "11.png", "12.png"
+      "molkky1.png", "molkky2.png", "molkky3.png", "molkky4.png",
+      "molkky5.png", "molkky6.png", "molkky7.png", "molkky8.png",
+      "molkky9.png", "molkky10.png", "molkky11.png", "molkky12.png"
     ];
 
     function startGame() {
@@ -605,11 +640,15 @@
         team.score = 25;
         updateDisplay();
         playDamageEffect();
-        setStatus(`${team.name} は目標点を超えたため25点に戻りました`);
+
+        setTimeout(() => {
+          showOverPopup();
+        }, 430);
 
         setTimeout(() => {
           nextTeam();
-        }, 450);
+          setStatus("");
+        }, 1500);
 
         return;
       }
@@ -647,7 +686,7 @@
       document.getElementById("currentTeam").textContent = team.name;
       document.getElementById("currentScore").textContent = team.score;
       document.getElementById("targetText").textContent =
-        `目標：${targetScore}点ぴったり`;
+        `目標：${targetScore}点`;
 
       teamCard.style.background = team.color.light;
       teamCard.style.borderColor = team.color.main;
@@ -663,27 +702,6 @@
       scoreButtons.forEach(btn => {
         btn.style.color = team.color.main;
         btn.style.borderColor = team.color.main;
-      });
-
-      const table = document.getElementById("scoreTable");
-      table.innerHTML = "";
-
-      teams.forEach((t, index) => {
-        const row = document.createElement("tr");
-
-        if (index === currentIndex && !gameOver) {
-          row.classList.add("current-row");
-        }
-
-        row.innerHTML = `
-          <td>
-            <span class="color-dot" style="background:${t.color.main};"></span>
-            ${t.name}
-          </td>
-          <td style="color:${t.color.main};">${t.score}</td>
-        `;
-
-        table.appendChild(row);
       });
 
       updateFixedScoreHeader();
@@ -730,6 +748,18 @@
         shell.classList.remove("damage");
         overlay.classList.remove("show");
       }, 450);
+    }
+
+    function showOverPopup() {
+      const popup = document.getElementById("overPopup");
+
+      popup.classList.remove("show");
+      void popup.offsetWidth;
+      popup.classList.add("show");
+
+      setTimeout(() => {
+        popup.classList.remove("show");
+      }, 1100);
     }
 
     function launchConfetti() {
@@ -833,22 +863,23 @@
         const zone = zones[index % zones.length];
 
         let size = isMobile
-          ? randomInt(88, 122)
-          : randomInt(110, 170);
+          ? randomInt(82, 116)
+          : randomInt(105, 160);
 
-        let x = Math.round((zone.x * vw) + Math.random() * (zone.w * vw - size));
-        let y = Math.round((zone.y * vh) + Math.random() * (zone.h * vh - size));
+        let x = Math.round((zone.x * vw) + Math.random() * Math.max(10, (zone.w * vw - size)));
+        let y = Math.round((zone.y * vh) + Math.random() * Math.max(10, (zone.h * vh - size)));
 
         let box = { x, y, w: size, h: size };
         let attempts = 0;
 
         while (placedBoxes.some(prev => intersects(box, prev, isMobile ? 10 : 14)) && attempts < 30) {
           size = isMobile
-            ? randomInt(88, 122)
-            : randomInt(110, 170);
+            ? randomInt(82, 116)
+            : randomInt(105, 160);
 
           x = Math.round((zone.x * vw) + Math.random() * Math.max(10, (zone.w * vw - size)));
           y = Math.round((zone.y * vh) + Math.random() * Math.max(10, (zone.h * vh - size)));
+
           box = { x, y, w: size, h: size };
           attempts++;
         }
@@ -862,7 +893,7 @@
         img.style.width = size + "px";
         img.style.left = x + "px";
         img.style.top = y + "px";
-        img.style.opacity = (Math.random() * 0.05 + 0.08).toFixed(2);
+        img.style.opacity = (Math.random() * 0.04 + 0.07).toFixed(2);
         img.style.transform = `rotate(${randomInt(-28, 28)}deg)`;
         container.appendChild(img);
       });
