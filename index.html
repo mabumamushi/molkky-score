@@ -3,21 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>モルック得点管理</title>
+  <title>Let’s play Mölkky!</title>
+
   <style>
-    body {
+    :root {
+      --bg: #f4f1e8;
+      --text: #263128;
+      --green: #2f8f46;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
       margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #f3f6ef;
-      color: #263128;
+      padding: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at top, #fff8df 0%, var(--bg) 52%, #e6eadf 100%);
+      color: var(--text);
       text-align: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 背景スキットル */
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-skittle {
+      position: absolute;
+      user-select: none;
+      -webkit-user-drag: none;
+      opacity: 0.12;
+      transform-origin: center center;
+      filter: saturate(0.95);
+    }
+
+    /* ダメージ演出 */
+    .damage-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 25;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        radial-gradient(circle at 50% 50%,
+          rgba(255, 0, 90, 0.28) 0%,
+          rgba(160, 0, 255, 0.18) 35%,
+          rgba(90, 0, 110, 0.12) 55%,
+          rgba(0, 0, 0, 0) 75%);
+    }
+
+    .damage-overlay.show {
+      animation: damageFlash 0.42s ease;
+    }
+
+    @keyframes damageFlash {
+      0%   { opacity: 0; }
+      20%  { opacity: 1; }
+      55%  { opacity: 0.82; }
+      100% { opacity: 0; }
+    }
+
+    #appShell {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+    }
+
+    #appShell.damage {
+      animation: screenShake 0.42s ease;
+    }
+
+    @keyframes screenShake {
+      0%   { transform: translate(0, 0); }
+      10%  { transform: translate(-7px, 3px); }
+      20%  { transform: translate(7px, -4px); }
+      30%  { transform: translate(-8px, -2px); }
+      40%  { transform: translate(8px, 3px); }
+      50%  { transform: translate(-6px, -3px); }
+      60%  { transform: translate(6px, 2px); }
+      70%  { transform: translate(-4px, 2px); }
+      80%  { transform: translate(4px, -2px); }
+      100% { transform: translate(0, 0); }
     }
 
     .screen {
       display: none;
       min-height: 100vh;
-      padding: 24px;
-      box-sizing: border-box;
+      padding: 22px;
+      position: relative;
     }
 
     .active {
@@ -25,279 +111,778 @@
     }
 
     h1 {
-      margin-top: 32px;
-      font-size: 32px;
+      margin-top: 28px;
+      font-size: 34px;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      opacity: 0.75;
+      margin-top: -8px;
+      position: relative;
+      z-index: 1;
     }
 
     .card {
-      background: white;
-      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 28px;
       padding: 24px;
       margin: 20px auto;
-      max-width: 420px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      max-width: 430px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.13);
+      border: 3px solid rgba(255,255,255,0.85);
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
-    select, input {
+    select,
+    input {
       font-size: 22px;
-      padding: 12px;
-      border-radius: 12px;
+      padding: 13px;
+      border-radius: 18px;
       border: 2px solid #b8c6b0;
-      width: 80%;
+      width: 82%;
       max-width: 280px;
       text-align: center;
       margin: 8px;
+      background: #fff;
     }
 
     button {
-      font-size: 22px;
-      padding: 14px 28px;
+      font-size: 21px;
+      padding: 14px 26px;
       border: none;
-      border-radius: 999px;
-      background: #2f8f46;
+      border-radius: 20px;
+      background: var(--green);
       color: white;
-      font-weight: bold;
-      margin: 10px;
+      font-weight: 800;
+      margin: 8px;
       cursor: pointer;
+      box-shadow: 0 5px 0 rgba(0,0,0,0.16);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      z-index: 1;
     }
 
-    button.secondary {
-      background: #777;
+    button:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.16);
+    }
+
+    .fixed-score-header {
+      position: sticky;
+      top: 0;
+      z-index: 12;
+      background: rgba(244, 241, 232, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 10px 8px 12px;
+      margin: -22px -22px 12px;
+      box-shadow: 0 5px 16px rgba(0,0,0,0.1);
+    }
+
+    .fixed-score-title {
+      font-size: 13px;
+      font-weight: 900;
+      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+
+    .fixed-score-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 5px 6px 7px;
+      max-width: 100%;
+      scrollbar-width: none;
+    }
+
+    .fixed-score-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .fixed-score-item {
+      min-width: 92px;
+      border-radius: 18px;
+      padding: 8px 10px;
+      font-weight: 900;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      border: 3px solid currentColor;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.9);
+    }
+
+    .fixed-score-name {
+      font-size: 13px;
+      line-height: 1.1;
+    }
+
+    .fixed-score-point {
+      font-size: 27px;
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    .fixed-score-item.active-team {
+      transform: scale(1.06);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+
+    .icon-button {
+      width: 58px;
+      height: 58px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.95);
+      color: #263128;
+      border: 2px solid #ccd5c5;
+    }
+
+    .top-actions {
+      max-width: 430px;
+      margin: -6px auto 8px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
     }
 
     .team-name {
-      font-size: 36px;
-      font-weight: bold;
-      margin: 12px 0;
+      font-size: 38px;
+      font-weight: 900;
+      margin: 10px 0;
     }
 
     .score {
-      font-size: 72px;
-      font-weight: 900;
-      margin: 12px 0;
-      color: #2f8f46;
+      font-size: 82px;
+      font-weight: 950;
+      margin: 4px 0 8px;
+      line-height: 1;
+    }
+
+    .target {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: #f1f4ed;
+      font-weight: 700;
     }
 
     .score-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      max-width: 420px;
-      margin: 20px auto;
+      gap: 14px;
+      max-width: 430px;
+      margin: 22px auto;
+      position: relative;
+      z-index: 1;
     }
 
     .score-buttons button {
-      margin: 0;
-      padding: 18px 0;
-      font-size: 24px;
-      background: #ffffff;
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      margin: 0 auto;
+      padding: 0;
+      font-size: 25px;
+      background: rgba(255,255,255,0.96);
       color: #263128;
-      border: 2px solid #2f8f46;
+      border: 4px solid currentColor;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.14);
     }
 
     .status {
-      font-size: 20px;
-      margin-top: 16px;
-      min-height: 28px;
-      font-weight: bold;
+      font-size: 19px;
+      margin-top: 12px;
+      min-height: 30px;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
     }
 
     table {
       width: 100%;
-      max-width: 420px;
+      max-width: 430px;
       margin: 20px auto;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 16px;
-      overflow: hidden;
+      border-collapse: separate;
+      border-spacing: 0 9px;
+      position: relative;
+      z-index: 1;
     }
 
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      font-size: 18px;
+    th {
+      font-size: 15px;
+      opacity: 0.7;
+      padding: 6px;
+    }
+
+    td {
+      padding: 13px;
+      font-size: 19px;
+      background: rgba(255,255,255,0.9);
+      font-weight: 800;
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+
+    td:first-child {
+      border-radius: 18px 0 0 18px;
+      text-align: left;
+    }
+
+    td:last-child {
+      border-radius: 0 18px 18px 0;
+      font-size: 24px;
+    }
+
+    .current-row td {
+      outline: 4px solid rgba(0,0,0,0.08);
+    }
+
+    .color-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      vertical-align: middle;
+      border: 2px solid rgba(0,0,0,0.15);
+    }
+
+    .team-card {
+      transition: background 0.25s ease, transform 0.25s ease;
+    }
+
+    .team-card.bump {
+      animation: bump 0.35s ease;
+    }
+
+    @keyframes bump {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.06) rotate(-1deg); }
+      100% { transform: scale(1); }
+    }
+
+    .winner-card {
+      animation: winnerPop 0.7s ease both;
+      border: 5px solid gold;
+      background: linear-gradient(180deg, #fffbe4, rgba(255,255,255,0.95));
     }
 
     .winner {
-      font-size: 36px;
-      font-weight: 900;
-      color: #2f8f46;
+      font-size: 38px;
+      font-weight: 950;
+      color: #c28a00;
+      line-height: 1.25;
+    }
+
+    @keyframes winnerPop {
+      0% { transform: scale(0.7); opacity: 0; }
+      55% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    .confetti {
+      position: fixed;
+      top: -20px;
+      width: 10px;
+      height: 16px;
+      z-index: 30;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0.92;
+      }
+    }
+
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 31px;
+      }
+
+      .score-buttons {
+        gap: 11px;
+      }
+
+      .score-buttons button {
+        width: 68px;
+        height: 68px;
+      }
+
+      .score {
+        font-size: 76px;
+      }
+
+      .fixed-score-item {
+        min-width: 84px;
+      }
     }
   </style>
 </head>
 
 <body>
+  <div id="bgPattern" class="bg-pattern" aria-hidden="true"></div>
+  <div id="damageOverlay" class="damage-overlay"></div>
 
-  <!-- 設定画面 -->
-  <div id="setupScreen" class="screen active">
-    <h1>モルック得点管理</h1>
+  <div id="appShell">
+    <!-- 設定画面 -->
+    <div id="setupScreen" class="screen active">
+      <h1>Let’s play Mölkky!</h1>
+      <p class="subtitle">モルック得点管理</p>
 
-    <div class="card">
-      <p>チーム数</p>
-      <select id="teamCount">
-        <option value="2">2チーム</option>
-        <option value="3">3チーム</option>
-        <option value="4">4チーム</option>
-        <option value="5">5チーム</option>
-        <option value="6">6チーム</option>
-      </select>
+      <div class="card">
+        <p>チーム数</p>
+        <select id="teamCount">
+          <option value="2">2チーム</option>
+          <option value="3">3チーム</option>
+          <option value="4">4チーム</option>
+          <option value="5">5チーム</option>
+          <option value="6">6チーム</option>
+        </select>
 
-      <p>目標点</p>
-      <input id="targetScore" type="number" value="50" min="1" />
+        <p>目標点</p>
+        <input id="targetScore" type="number" value="50" min="1" />
 
-      <br>
-      <button onclick="startGame()">ゲーム開始</button>
+        <br>
+        <button onclick="startGame()">ゲーム開始</button>
+      </div>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="gameScreen" class="screen">
+      <div class="fixed-score-header">
+        <div class="fixed-score-title">SCORE</div>
+        <div id="fixedScoreRow" class="fixed-score-row"></div>
+      </div>
+
+      <h1>Let’s play Mölkky!</h1>
+
+      <div class="top-actions">
+        <button class="icon-button" onclick="undoScore()" title="1手戻す">↩︎</button>
+        <button class="icon-button" onclick="resetGame()" title="リセット">🔄</button>
+      </div>
+
+      <div id="teamCard" class="card team-card">
+        <div id="currentTeam" class="team-name">チームA</div>
+        <div id="currentScore" class="score">0</div>
+        <div id="targetText" class="target">目標：50点ぴったり</div>
+      </div>
+
+      <div class="score-buttons" id="scoreButtons"></div>
+
+      <div id="status" class="status"></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>チーム</th>
+            <th>得点</th>
+          </tr>
+        </thead>
+        <tbody id="scoreTable"></tbody>
+      </table>
+    </div>
+
+    <!-- 勝利画面 -->
+    <div id="winnerScreen" class="screen">
+      <h1>Let’s play Mölkky!</h1>
+
+      <div class="card winner-card">
+        <div class="winner" id="winnerText"></div>
+        <p>ぴったり達成！</p>
+      </div>
+
+      <button onclick="resetGame()">🔄 最初から</button>
     </div>
   </div>
 
-  <!-- ゲーム画面 -->
-  <div id="gameScreen" class="screen">
-    <h1>現在の手番</h1>
+  <script>
+    let teams = [];
+    let currentIndex = 0;
+    let targetScore = 50;
+    let gameOver = false;
+    let history = [];
 
-    <div class="card">
-      <div id="currentTeam" class="team-name">チームA</div>
-      <div id="currentScore" class="score">0</div>
-      <div id="targetText">目標：50点ぴったり</div>
-    </div>
+    const teamColors = [
+      { name: "赤", main: "#e53935", light: "#ffe6e6" },
+      { name: "青", main: "#1e88e5", light: "#e4f1ff" },
+      { name: "黄色", main: "#fbc02d", light: "#fff7cc" },
+      { name: "紫", main: "#8e24aa", light: "#f4e4fa" },
+      { name: "オレンジ", main: "#fb8c00", light: "#fff0d9" },
+      { name: "緑", main: "#43a047", light: "#e5f6e8" }
+    ];
 
-    <div class="score-buttons" id="scoreButtons"></div>
+    /* 背景に使う画像。
+       GitHubに 1.png ～ 12.png を同じ階層へアップしてください。 */
+    const bgImages = [
+      "1.png", "2.png", "3.png", "4.png", "5.png", "6.png",
+      "7.png", "8.png", "9.png", "10.png", "11.png", "12.png"
+    ];
 
-    <div id="status" class="status"></div>
+    function startGame() {
+      const count = Number(document.getElementById("teamCount").value);
+      targetScore = Number(document.getElementById("targetScore").value);
 
-    <table>
-      <thead>
-        <tr>
-          <th>チーム</th>
-          <th>得点</th>
-        </tr>
-      </thead>
-      <tbody id="scoreTable"></tbody>
-    </table>
+      teams = [];
 
-    <button class="secondary" onclick="resetGame()">リセット</button>
-  </div>
+      for (let i = 0; i < count; i++) {
+        teams.push({
+          name: `チーム${String.fromCharCode(65 + i)}`,
+          score: 0,
+          color: teamColors[i]
+        });
+      }
 
-  <!-- 勝利画面 -->
-  <div id="winnerScreen" class="screen">
-    <h1>ゲーム終了</h1>
+      currentIndex = 0;
+      gameOver = false;
+      history = [];
 
-    <div class="card">
-      <div class="winner" id="winnerText"></div>
-      <p>おめでとう！</p>
-    </div>
+      createScoreButtons();
+      showScreen("gameScreen");
+      updateDisplay();
+      setStatus("得点を入力してください");
+    }
 
-    <button onclick="resetGame()">最初から</button>
-  </div>
+    function createScoreButtons() {
+      const area = document.getElementById("scoreButtons");
+      area.innerHTML = "";
 
-<script>
-  let teams = [];
-  let currentIndex = 0;
-  let targetScore = 50;
-  let gameOver = false;
+      for (let i = 0; i <= 12; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.onclick = () => addScore(i);
+        area.appendChild(btn);
+      }
+    }
 
-  function startGame() {
-    const count = Number(document.getElementById("teamCount").value);
-    targetScore = Number(document.getElementById("targetScore").value);
+    function addScore(points) {
+      if (gameOver) return;
 
-    teams = [];
+      history.push({
+        teams: JSON.parse(JSON.stringify(teams)),
+        currentIndex: currentIndex,
+        gameOver: gameOver
+      });
 
-    for (let i = 0; i < count; i++) {
-      teams.push({
-        name: `チーム${String.fromCharCode(65 + i)}`,
-        score: 0
+      const team = teams[currentIndex];
+      const newScore = team.score + points;
+
+      if (newScore === targetScore) {
+        team.score = newScore;
+        gameOver = true;
+        updateDisplay();
+
+        document.getElementById("winnerText").innerHTML =
+          `${team.name} の勝利🏅`;
+
+        showScreen("winnerScreen");
+        launchConfetti();
+        return;
+      }
+
+      if (newScore > targetScore) {
+        team.score = 25;
+        updateDisplay();
+        playDamageEffect();
+        setStatus(`${team.name} は目標点を超えたため25点に戻りました`);
+
+        setTimeout(() => {
+          nextTeam();
+        }, 450);
+
+        return;
+      }
+
+      team.score = newScore;
+      setStatus(`${team.name} に ${points} 点追加`);
+      nextTeam();
+    }
+
+    function nextTeam() {
+      currentIndex = (currentIndex + 1) % teams.length;
+      updateDisplay();
+    }
+
+    function undoScore() {
+      if (history.length === 0) {
+        setStatus("戻せる得点がありません");
+        return;
+      }
+
+      const last = history.pop();
+      teams = last.teams;
+      currentIndex = last.currentIndex;
+      gameOver = last.gameOver;
+
+      showScreen("gameScreen");
+      updateDisplay();
+      setStatus("1手戻しました");
+    }
+
+    function updateDisplay() {
+      const team = teams[currentIndex];
+      const teamCard = document.getElementById("teamCard");
+
+      document.getElementById("currentTeam").textContent = team.name;
+      document.getElementById("currentScore").textContent = team.score;
+      document.getElementById("targetText").textContent =
+        `目標：${targetScore}点ぴったり`;
+
+      teamCard.style.background = team.color.light;
+      teamCard.style.borderColor = team.color.main;
+
+      document.getElementById("currentTeam").style.color = team.color.main;
+      document.getElementById("currentScore").style.color = team.color.main;
+
+      teamCard.classList.remove("bump");
+      void teamCard.offsetWidth;
+      teamCard.classList.add("bump");
+
+      const scoreButtons = document.querySelectorAll(".score-buttons button");
+      scoreButtons.forEach(btn => {
+        btn.style.color = team.color.main;
+        btn.style.borderColor = team.color.main;
+      });
+
+      const table = document.getElementById("scoreTable");
+      table.innerHTML = "";
+
+      teams.forEach((t, index) => {
+        const row = document.createElement("tr");
+
+        if (index === currentIndex && !gameOver) {
+          row.classList.add("current-row");
+        }
+
+        row.innerHTML = `
+          <td>
+            <span class="color-dot" style="background:${t.color.main};"></span>
+            ${t.name}
+          </td>
+          <td style="color:${t.color.main};">${t.score}</td>
+        `;
+
+        table.appendChild(row);
+      });
+
+      updateFixedScoreHeader();
+    }
+
+    function updateFixedScoreHeader() {
+      const fixedScoreRow = document.getElementById("fixedScoreRow");
+      fixedScoreRow.innerHTML = "";
+
+      teams.forEach((t, index) => {
+        const item = document.createElement("div");
+        item.className = "fixed-score-item";
+
+        if (index === currentIndex && !gameOver) {
+          item.classList.add("active-team");
+        }
+
+        item.style.color = t.color.main;
+        item.style.background = t.color.light;
+
+        item.innerHTML = `
+          <div class="fixed-score-name">${t.name}</div>
+          <div class="fixed-score-point">${t.score}</div>
+        `;
+
+        fixedScoreRow.appendChild(item);
       });
     }
 
-    currentIndex = 0;
-    gameOver = false;
+    function playDamageEffect() {
+      const shell = document.getElementById("appShell");
+      const overlay = document.getElementById("damageOverlay");
 
-    createScoreButtons();
-    showScreen("gameScreen");
-    updateDisplay();
-  }
+      shell.classList.remove("damage");
+      overlay.classList.remove("show");
 
-  function createScoreButtons() {
-    const area = document.getElementById("scoreButtons");
-    area.innerHTML = "";
+      void shell.offsetWidth;
+      void overlay.offsetWidth;
 
-    for (let i = 0; i <= 12; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      btn.onclick = () => addScore(i);
-      area.appendChild(btn);
-    }
-  }
+      shell.classList.add("damage");
+      overlay.classList.add("show");
 
-  function addScore(points) {
-    if (gameOver) return;
-
-    const team = teams[currentIndex];
-    const beforeScore = team.score;
-    let newScore = beforeScore + points;
-
-    if (newScore === targetScore) {
-      team.score = newScore;
-      gameOver = true;
-      updateDisplay();
-      document.getElementById("winnerText").textContent = `${team.name} の勝利！`;
-      showScreen("winnerScreen");
-      return;
+      setTimeout(() => {
+        shell.classList.remove("damage");
+        overlay.classList.remove("show");
+      }, 450);
     }
 
-    if (newScore > targetScore) {
-      team.score = 25;
-      document.getElementById("status").textContent =
-        `${team.name} は目標点を超えたため25点に戻りました`;
-    } else {
-      team.score = newScore;
-      document.getElementById("status").textContent =
-        `${team.name} に ${points} 点追加`;
-    }
+    function launchConfetti() {
+      const colors = ["#e53935", "#1e88e5", "#fbc02d", "#8e24aa", "#fb8c00", "#43a047"];
 
-    currentIndex = (currentIndex + 1) % teams.length;
-    updateDisplay();
-  }
+      for (let i = 0; i < 100; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = 2.2 + Math.random() * 2.2 + "s";
+        piece.style.animationDelay = Math.random() * 0.6 + "s";
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(piece);
 
-  function updateDisplay() {
-    const team = teams[currentIndex];
-
-    document.getElementById("currentTeam").textContent = team.name;
-    document.getElementById("currentScore").textContent = team.score;
-    document.getElementById("targetText").textContent =
-      `目標：${targetScore}点ぴったり`;
-
-    const table = document.getElementById("scoreTable");
-    table.innerHTML = "";
-
-    teams.forEach((t, index) => {
-      const row = document.createElement("tr");
-
-      if (index === currentIndex && !gameOver) {
-        row.style.background = "#e6f4e8";
-        row.style.fontWeight = "bold";
+        setTimeout(() => {
+          piece.remove();
+        }, 5000);
       }
+    }
 
-      row.innerHTML = `
-        <td>${t.name}</td>
-        <td>${t.score}</td>
-      `;
+    function setStatus(message) {
+      document.getElementById("status").textContent = message;
+    }
 
-      table.appendChild(row);
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach(screen => {
+        screen.classList.remove("active");
+      });
+
+      document.getElementById(id).classList.add("active");
+    }
+
+    function resetGame() {
+      showScreen("setupScreen");
+    }
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function intersects(a, b, padding = 12) {
+      return !(
+        a.x + a.w + padding < b.x ||
+        a.x > b.x + b.w + padding ||
+        a.y + a.h + padding < b.y ||
+        a.y > b.y + b.h + padding
+      );
+    }
+
+    function createBackgroundPattern() {
+      const container = document.getElementById("bgPattern");
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const imagePool = shuffle(bgImages);
+
+      const isMobile = vw < 768;
+      const itemCount = isMobile ? 8 : 12;
+      const chosen = imagePool.slice(0, itemCount);
+
+      const zonesMobile = [
+        { x: 0.02, y: 0.03, w: 0.18, h: 0.14 },
+        { x: 0.78, y: 0.03, w: 0.18, h: 0.14 },
+        { x: 0.03, y: 0.19, w: 0.16, h: 0.14 },
+        { x: 0.81, y: 0.20, w: 0.14, h: 0.14 },
+        { x: 0.03, y: 0.45, w: 0.16, h: 0.14 },
+        { x: 0.81, y: 0.44, w: 0.14, h: 0.14 },
+        { x: 0.06, y: 0.77, w: 0.16, h: 0.14 },
+        { x: 0.77, y: 0.77, w: 0.16, h: 0.14 }
+      ];
+
+      const zonesDesktop = [
+        { x: 0.02, y: 0.03, w: 0.14, h: 0.14 },
+        { x: 0.18, y: 0.03, w: 0.12, h: 0.13 },
+        { x: 0.76, y: 0.03, w: 0.12, h: 0.13 },
+        { x: 0.86, y: 0.04, w: 0.12, h: 0.14 },
+        { x: 0.03, y: 0.22, w: 0.12, h: 0.13 },
+        { x: 0.86, y: 0.22, w: 0.11, h: 0.13 },
+        { x: 0.03, y: 0.42, w: 0.13, h: 0.13 },
+        { x: 0.86, y: 0.42, w: 0.11, h: 0.13 },
+        { x: 0.03, y: 0.62, w: 0.13, h: 0.13 },
+        { x: 0.86, y: 0.62, w: 0.11, h: 0.13 },
+        { x: 0.10, y: 0.80, w: 0.13, h: 0.13 },
+        { x: 0.78, y: 0.80, w: 0.13, h: 0.13 }
+      ];
+
+      const zones = isMobile ? zonesMobile : zonesDesktop;
+      const placedBoxes = [];
+
+      chosen.forEach((src, index) => {
+        const zone = zones[index % zones.length];
+
+        let size = isMobile
+          ? randomInt(88, 122)
+          : randomInt(110, 170);
+
+        let x = Math.round((zone.x * vw) + Math.random() * (zone.w * vw - size));
+        let y = Math.round((zone.y * vh) + Math.random() * (zone.h * vh - size));
+
+        let box = { x, y, w: size, h: size };
+        let attempts = 0;
+
+        while (placedBoxes.some(prev => intersects(box, prev, isMobile ? 10 : 14)) && attempts < 30) {
+          size = isMobile
+            ? randomInt(88, 122)
+            : randomInt(110, 170);
+
+          x = Math.round((zone.x * vw) + Math.random() * Math.max(10, (zone.w * vw - size)));
+          y = Math.round((zone.y * vh) + Math.random() * Math.max(10, (zone.h * vh - size)));
+          box = { x, y, w: size, h: size };
+          attempts++;
+        }
+
+        placedBoxes.push(box);
+
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = "";
+        img.className = "bg-skittle";
+        img.style.width = size + "px";
+        img.style.left = x + "px";
+        img.style.top = y + "px";
+        img.style.opacity = (Math.random() * 0.05 + 0.08).toFixed(2);
+        img.style.transform = `rotate(${randomInt(-28, 28)}deg)`;
+        container.appendChild(img);
+      });
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        createBackgroundPattern();
+      }, 180);
     });
-  }
 
-  function showScreen(id) {
-    document.querySelectorAll(".screen").forEach(screen => {
-      screen.classList.remove("active");
+    window.addEventListener("load", () => {
+      createBackgroundPattern();
     });
-
-    document.getElementById(id).classList.add("active");
-  }
-
-  function resetGame() {
-    showScreen("setupScreen");
-  }
-</script>
-
+  </script>
 </body>
 </html>
