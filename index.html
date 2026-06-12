@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>モルック得点管理</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f3f6ef;
+      color: #263128;
+      text-align: center;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .active {
+      display: block;
+    }
+
+    h1 {
+      margin-top: 32px;
+      font-size: 32px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      margin: 20px auto;
+      max-width: 420px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    select, input {
+      font-size: 22px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid #b8c6b0;
+      width: 80%;
+      max-width: 280px;
+      text-align: center;
+      margin: 8px;
+    }
+
+    button {
+      font-size: 22px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 999px;
+      background: #2f8f46;
+      color: white;
+      font-weight: bold;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #777;
+    }
+
+    .team-name {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 12px 0;
+    }
+
+    .score {
+      font-size: 72px;
+      font-weight: 900;
+      margin: 12px 0;
+      color: #2f8f46;
+    }
+
+    .score-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 420px;
+      margin: 20px auto;
+    }
+
+    .score-buttons button {
+      margin: 0;
+      padding: 18px 0;
+      font-size: 24px;
+      background: #ffffff;
+      color: #263128;
+      border: 2px solid #2f8f46;
+    }
+
+    .status {
+      font-size: 20px;
+      margin-top: 16px;
+      min-height: 28px;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      max-width: 420px;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      font-size: 18px;
+    }
+
+    .winner {
+      font-size: 36px;
+      font-weight: 900;
+      color: #2f8f46;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 設定画面 -->
+  <div id="setupScreen" class="screen active">
+    <h1>モルック得点管理</h1>
+
+    <div class="card">
+      <p>チーム数</p>
+      <select id="teamCount">
+        <option value="2">2チーム</option>
+        <option value="3">3チーム</option>
+        <option value="4">4チーム</option>
+        <option value="5">5チーム</option>
+        <option value="6">6チーム</option>
+      </select>
+
+      <p>目標点</p>
+      <input id="targetScore" type="number" value="50" min="1" />
+
+      <br>
+      <button onclick="startGame()">ゲーム開始</button>
+    </div>
+  </div>
+
+  <!-- ゲーム画面 -->
+  <div id="gameScreen" class="screen">
+    <h1>現在の手番</h1>
+
+    <div class="card">
+      <div id="currentTeam" class="team-name">チームA</div>
+      <div id="currentScore" class="score">0</div>
+      <div id="targetText">目標：50点ぴったり</div>
+    </div>
+
+    <div class="score-buttons" id="scoreButtons"></div>
+
+    <div id="status" class="status"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>チーム</th>
+          <th>得点</th>
+        </tr>
+      </thead>
+      <tbody id="scoreTable"></tbody>
+    </table>
+
+    <button class="secondary" onclick="resetGame()">リセット</button>
+  </div>
+
+  <!-- 勝利画面 -->
+  <div id="winnerScreen" class="screen">
+    <h1>ゲーム終了</h1>
+
+    <div class="card">
+      <div class="winner" id="winnerText"></div>
+      <p>おめでとう！</p>
+    </div>
+
+    <button onclick="resetGame()">最初から</button>
+  </div>
+
+<script>
+  let teams = [];
+  let currentIndex = 0;
+  let targetScore = 50;
+  let gameOver = false;
+
+  function startGame() {
+    const count = Number(document.getElementById("teamCount").value);
+    targetScore = Number(document.getElementById("targetScore").value);
+
+    teams = [];
+
+    for (let i = 0; i < count; i++) {
+      teams.push({
+        name: `チーム${String.fromCharCode(65 + i)}`,
+        score: 0
+      });
+    }
+
+    currentIndex = 0;
+    gameOver = false;
+
+    createScoreButtons();
+    showScreen("gameScreen");
+    updateDisplay();
+  }
+
+  function createScoreButtons() {
+    const area = document.getElementById("scoreButtons");
+    area.innerHTML = "";
+
+    for (let i = 0; i <= 12; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      btn.onclick = () => addScore(i);
+      area.appendChild(btn);
+    }
+  }
+
+  function addScore(points) {
+    if (gameOver) return;
+
+    const team = teams[currentIndex];
+    const beforeScore = team.score;
+    let newScore = beforeScore + points;
+
+    if (newScore === targetScore) {
+      team.score = newScore;
+      gameOver = true;
+      updateDisplay();
+      document.getElementById("winnerText").textContent = `${team.name} の勝利！`;
+      showScreen("winnerScreen");
+      return;
+    }
+
+    if (newScore > targetScore) {
+      team.score = 25;
+      document.getElementById("status").textContent =
+        `${team.name} は目標点を超えたため25点に戻りました`;
+    } else {
+      team.score = newScore;
+      document.getElementById("status").textContent =
+        `${team.name} に ${points} 点追加`;
+    }
+
+    currentIndex = (currentIndex + 1) % teams.length;
+    updateDisplay();
+  }
+
+  function updateDisplay() {
+    const team = teams[currentIndex];
+
+    document.getElementById("currentTeam").textContent = team.name;
+    document.getElementById("currentScore").textContent = team.score;
+    document.getElementById("targetText").textContent =
+      `目標：${targetScore}点ぴったり`;
+
+    const table = document.getElementById("scoreTable");
+    table.innerHTML = "";
+
+    teams.forEach((t, index) => {
+      const row = document.createElement("tr");
+
+      if (index === currentIndex && !gameOver) {
+        row.style.background = "#e6f4e8";
+        row.style.fontWeight = "bold";
+      }
+
+      row.innerHTML = `
+        <td>${t.name}</td>
+        <td>${t.score}</td>
+      `;
+
+      table.appendChild(row);
+    });
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(screen => {
+      screen.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+  }
+
+  function resetGame() {
+    showScreen("setupScreen");
+  }
+</script>
+
+</body>
+</html>
