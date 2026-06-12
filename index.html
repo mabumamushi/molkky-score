@@ -59,12 +59,6 @@
       z-index: 25;
       pointer-events: none;
       opacity: 0;
-      background:
-        radial-gradient(circle at 50% 50%,
-          rgba(255, 0, 90, 0.30) 0%,
-          rgba(160, 0, 255, 0.22) 35%,
-          rgba(90, 0, 110, 0.14) 55%,
-          rgba(0, 0, 0, 0) 75%);
     }
 
     .damage-overlay.show {
@@ -320,7 +314,7 @@
     .top-actions {
       max-width: 390px;
       margin: 2px auto 5px;
-      padding: 0 8px;
+      padding: 0 8px 0 17px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
@@ -397,11 +391,11 @@
     .score-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      row-gap: 16px;
+      row-gap: 22px;
       column-gap: 12px;
       width: 100%;
       max-width: 390px;
-      margin: 18px auto 10px;
+      margin: 20px auto 10px;
       padding: 0 8px;
       position: relative;
       z-index: 1;
@@ -515,11 +509,17 @@
         font-size: 54px;
       }
 
+      .top-actions {
+        max-width: 350px;
+        padding-left: 8px;
+        padding-right: 0;
+      }
+
       .score-buttons {
         max-width: 350px;
-        row-gap: 15px;
+        row-gap: 21px;
         column-gap: 10px;
-        margin: 16px auto 8px;
+        margin: 18px auto 8px;
         padding: 0;
       }
 
@@ -604,8 +604,8 @@
       }
 
       .score-buttons {
-        row-gap: 12px;
-        margin: 12px auto 6px;
+        row-gap: 17px;
+        margin: 13px auto 6px;
       }
 
       .score-buttons button {
@@ -790,13 +790,14 @@
 
       if (newScore > targetScore) {
         const restartScore = getRestartScore();
+        const overColor = team.color.main;
 
         team.score = restartScore;
         updateDisplay();
-        playDamageEffect();
+        playDamageEffect(overColor);
 
         setTimeout(() => {
-          showOverPopup(restartScore);
+          showOverPopup(restartScore, overColor);
         }, 430);
 
         setTimeout(() => {
@@ -881,9 +882,18 @@
       });
     }
 
-    function playDamageEffect() {
+    function playDamageEffect(color) {
       const shell = document.getElementById("appShell");
       const overlay = document.getElementById("damageOverlay");
+      const rgb = hexToRgb(color);
+
+      overlay.style.background = `
+        radial-gradient(circle at 50% 50%,
+          rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.34) 0%,
+          rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.24) 35%,
+          rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.16) 55%,
+          rgba(0, 0, 0, 0) 75%)
+      `;
 
       shell.classList.remove("damage");
       overlay.classList.remove("show");
@@ -900,11 +910,16 @@
       }, 450);
     }
 
-    function showOverPopup(restartScore) {
+    function showOverPopup(restartScore, color) {
       const popup = document.getElementById("overPopup");
+      const card = document.querySelector(".over-popup-card");
+      const title = document.querySelector(".over-popup-title");
       const text = document.querySelector(".over-popup-text");
 
       text.textContent = `${restartScore}点からスタート`;
+
+      card.style.borderColor = color;
+      title.style.color = color;
 
       popup.classList.remove("show");
       void popup.offsetWidth;
@@ -921,6 +936,17 @@
       }
 
       return 25;
+    }
+
+    function hexToRgb(hex) {
+      const cleanHex = hex.replace("#", "");
+      const bigint = parseInt(cleanHex, 16);
+
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+      };
     }
 
     function launchConfetti() {
@@ -956,10 +982,12 @@
 
     function shuffle(array) {
       const arr = [...array];
+
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
+
       return arr;
     }
 
