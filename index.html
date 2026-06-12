@@ -163,7 +163,7 @@
       display: none;
       width: 100%;
       height: 100dvh;
-      padding: 14px 18px;
+      padding: 12px 18px;
       position: relative;
       overflow: hidden;
     }
@@ -246,16 +246,35 @@
     .fixed-score-header {
       position: relative;
       z-index: 12;
-      background: rgba(244, 241, 232, 0.78);
+      background: rgba(244, 241, 232, 0.80);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       padding: 8px 8px 9px;
-      margin: -14px -18px 8px;
+      margin: -12px -18px 8px;
       box-shadow: 0 5px 16px rgba(0,0,0,0.1);
     }
 
+    .app-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 22px;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: -0.3px;
+    }
+
+    .app-title-logo {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
     .fixed-score-title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 900;
       opacity: 0.7;
       margin-bottom: 4px;
@@ -304,13 +323,17 @@
 
     .top-actions {
       max-width: 390px;
-      margin: 2px auto 4px;
+      margin: 2px auto 5px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
       gap: 8px;
       position: relative;
       z-index: 1;
+    }
+
+    .official-button {
+      margin-right: auto;
     }
 
     .icon-button {
@@ -377,20 +400,23 @@
     .score-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 9px;
-      max-width: 340px;
-      margin: 12px auto;
+      row-gap: 16px;
+      column-gap: 12px;
+      width: 100%;
+      max-width: 390px;
+      margin: 18px auto 10px;
+      padding: 0 8px;
       position: relative;
       z-index: 1;
     }
 
     .score-buttons button {
-      width: 58px;
-      height: 58px;
+      width: 66px;
+      height: 66px;
       border-radius: 50%;
       margin: 0 auto;
       padding: 0;
-      font-size: 22px;
+      font-size: 24px;
       background: rgba(255,255,255,0.96);
       color: #263128;
       border: 4px solid currentColor;
@@ -403,12 +429,7 @@
     }
 
     .status {
-      font-size: 16px;
-      margin-top: 6px;
-      min-height: 22px;
-      font-weight: 800;
-      position: relative;
-      z-index: 1;
+      display: none;
     }
 
     .team-card {
@@ -466,17 +487,21 @@
     }
 
     @media (max-width: 420px) {
-      h1 {
-        font-size: 28px;
-        margin-top: 10px;
-      }
-
       .screen {
-        padding: 12px 14px;
+        padding: 10px 14px;
       }
 
       .fixed-score-header {
-        margin: -12px -14px 7px;
+        margin: -10px -14px 7px;
+      }
+
+      .app-title-row {
+        font-size: 20px;
+      }
+
+      .app-title-logo {
+        width: 32px;
+        height: 32px;
       }
 
       .card {
@@ -494,15 +519,17 @@
       }
 
       .score-buttons {
-        gap: 8px;
-        max-width: 320px;
-        margin: 10px auto;
+        max-width: 350px;
+        row-gap: 15px;
+        column-gap: 10px;
+        margin: 16px auto 8px;
+        padding: 0;
       }
 
       .score-buttons button {
-        width: 54px;
-        height: 54px;
-        font-size: 21px;
+        width: 64px;
+        height: 64px;
+        font-size: 23px;
       }
 
       .fixed-score-item {
@@ -541,9 +568,14 @@
         padding: 6px 8px 7px;
       }
 
-      h1 {
-        font-size: 25px;
-        margin: 7px 0 4px;
+      .app-title-row {
+        font-size: 18px;
+        margin-bottom: 4px;
+      }
+
+      .app-title-logo {
+        width: 28px;
+        height: 28px;
       }
 
       .top-actions {
@@ -575,19 +607,14 @@
       }
 
       .score-buttons {
-        gap: 7px;
-        margin: 8px auto;
+        row-gap: 12px;
+        margin: 12px auto 6px;
       }
 
       .score-buttons button {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-      }
-
-      .status {
-        font-size: 14px;
-        min-height: 18px;
+        width: 58px;
+        height: 58px;
+        font-size: 22px;
       }
     }
   </style>
@@ -616,7 +643,6 @@
           <option value="3">3チーム</option>
           <option value="4">4チーム</option>
           <option value="5">5チーム</option>
-          <option value="6">6チーム</option>
         </select>
 
         <p>目標点</p>
@@ -629,11 +655,14 @@
 
     <div id="gameScreen" class="screen">
       <div class="fixed-score-header">
+        <div class="app-title-row">
+          <img class="app-title-logo" src="molkky14.png" alt="" />
+          <span>Let’s play Mölkky!</span>
+        </div>
+
         <div class="fixed-score-title">SCORE</div>
         <div id="fixedScoreRow" class="fixed-score-row"></div>
       </div>
-
-      <h1>Let’s play Mölkky!</h1>
 
       <div class="top-actions">
         <a
@@ -688,8 +717,7 @@
       { name: "青", main: "#1e88e5", light: "#e4f1ff" },
       { name: "黄色", main: "#fbc02d", light: "#fff7cc" },
       { name: "紫", main: "#8e24aa", light: "#f4e4fa" },
-      { name: "オレンジ", main: "#fb8c00", light: "#fff0d9" },
-      { name: "緑", main: "#43a047", light: "#e5f6e8" }
+      { name: "オレンジ", main: "#fb8c00", light: "#fff0d9" }
     ];
 
     const bgImages = [
@@ -719,7 +747,6 @@
       createScoreButtons();
       showScreen("gameScreen");
       updateDisplay();
-      setStatus("得点を入力してください");
     }
 
     function createScoreButtons() {
@@ -776,14 +803,12 @@
 
         setTimeout(() => {
           nextTeam();
-          setStatus("");
         }, 1500);
 
         return;
       }
 
       team.score = newScore;
-      setStatus(`${team.name} に ${points} 点追加`);
       nextTeam();
     }
 
@@ -794,7 +819,6 @@
 
     function undoScore() {
       if (history.length === 0) {
-        setStatus("戻せる得点がありません");
         return;
       }
 
@@ -805,7 +829,6 @@
 
       showScreen("gameScreen");
       updateDisplay();
-      setStatus("1手戻しました");
     }
 
     function updateDisplay() {
@@ -908,10 +931,6 @@
           piece.remove();
         }, 5000);
       }
-    }
-
-    function setStatus(message) {
-      document.getElementById("status").textContent = message;
     }
 
     function showScreen(id) {
