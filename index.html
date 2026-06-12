@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Let’s play Mölkky!</title>
 
   <style>
@@ -16,10 +16,13 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
-      min-height: 100%;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
     }
 
     body {
@@ -28,11 +31,11 @@
         radial-gradient(circle at top, #fff8df 0%, var(--bg) 52%, #e6eadf 100%);
       color: var(--text);
       text-align: center;
-      overflow-x: hidden;
       position: relative;
+      overscroll-behavior: none;
+      touch-action: manipulation;
     }
 
-    /* 背景スキットル */
     .bg-pattern {
       position: fixed;
       inset: 0;
@@ -45,12 +48,11 @@
       position: absolute;
       user-select: none;
       -webkit-user-drag: none;
-      opacity: 0.12;
+      opacity: 0.18;
       transform-origin: center center;
-      filter: saturate(0.95);
+      filter: saturate(1.02);
     }
 
-    /* オーバー時のダメージ演出 */
     .damage-overlay {
       position: fixed;
       inset: 0;
@@ -59,9 +61,9 @@
       opacity: 0;
       background:
         radial-gradient(circle at 50% 50%,
-          rgba(255, 0, 90, 0.28) 0%,
-          rgba(160, 0, 255, 0.18) 35%,
-          rgba(90, 0, 110, 0.12) 55%,
+          rgba(255, 0, 90, 0.30) 0%,
+          rgba(160, 0, 255, 0.22) 35%,
+          rgba(90, 0, 110, 0.14) 55%,
           rgba(0, 0, 0, 0) 75%);
     }
 
@@ -79,7 +81,9 @@
     #appShell {
       position: relative;
       z-index: 1;
-      min-height: 100vh;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
     }
 
     #appShell.damage {
@@ -99,7 +103,6 @@
       100% { transform: translate(0, 0); }
     }
 
-    /* オーバー後ポップアップ */
     .over-popup {
       position: fixed;
       inset: 0;
@@ -158,9 +161,11 @@
 
     .screen {
       display: none;
-      min-height: 100vh;
-      padding: 22px;
+      width: 100%;
+      height: 100dvh;
+      padding: 14px 18px;
       position: relative;
+      overflow: hidden;
     }
 
     .active {
@@ -168,8 +173,8 @@
     }
 
     h1 {
-      margin-top: 20px;
-      font-size: 32px;
+      margin: 12px 0 6px;
+      font-size: 30px;
       line-height: 1.1;
       letter-spacing: -0.5px;
       position: relative;
@@ -177,9 +182,9 @@
     }
 
     .subtitle {
-      font-size: 16px;
+      font-size: 15px;
       opacity: 0.75;
-      margin-top: -8px;
+      margin: 0 0 8px;
       position: relative;
       z-index: 1;
     }
@@ -187,9 +192,9 @@
     .card {
       background: rgba(255, 255, 255, 0.9);
       border-radius: 24px;
-      padding: 18px;
-      margin: 14px auto;
-      max-width: 400px;
+      padding: 16px;
+      margin: 10px auto;
+      max-width: 390px;
       box-shadow: 0 10px 24px rgba(0,0,0,0.12);
       border: 3px solid rgba(255,255,255,0.85);
       position: relative;
@@ -200,8 +205,8 @@
 
     select,
     input {
-      font-size: 22px;
-      padding: 13px;
+      font-size: 21px;
+      padding: 12px;
       border-radius: 18px;
       border: 2px solid #b8c6b0;
       width: 82%;
@@ -211,9 +216,14 @@
       background: #fff;
     }
 
+    button,
+    .icon-button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
     button {
-      font-size: 21px;
-      padding: 14px 26px;
+      font-size: 20px;
+      padding: 13px 24px;
       border: none;
       border-radius: 20px;
       background: var(--green);
@@ -223,26 +233,24 @@
       cursor: pointer;
       box-shadow: 0 5px 0 rgba(0,0,0,0.16);
       transition: transform 0.08s ease, box-shadow 0.08s ease;
-      -webkit-tap-highlight-color: transparent;
       position: relative;
       z-index: 1;
     }
 
-    button:active {
+    button:active,
+    .icon-button:active {
       transform: translateY(4px);
       box-shadow: 0 1px 0 rgba(0,0,0,0.16);
     }
 
-    /* 固定スコアヘッダー */
     .fixed-score-header {
-      position: sticky;
-      top: 0;
+      position: relative;
       z-index: 12;
       background: rgba(244, 241, 232, 0.78);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      padding: 8px 8px 10px;
-      margin: -22px -22px 10px;
+      padding: 8px 8px 9px;
+      margin: -14px -18px 8px;
       box-shadow: 0 5px 16px rgba(0,0,0,0.1);
     }
 
@@ -250,14 +258,14 @@
       font-size: 12px;
       font-weight: 900;
       opacity: 0.7;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
 
     .fixed-score-row {
       display: flex;
-      gap: 8px;
+      gap: 7px;
       overflow-x: auto;
-      padding: 5px 6px 7px;
+      padding: 4px 6px 6px;
       max-width: 100%;
       scrollbar-width: none;
     }
@@ -267,9 +275,9 @@
     }
 
     .fixed-score-item {
-      min-width: 86px;
-      border-radius: 17px;
-      padding: 7px 9px;
+      min-width: 78px;
+      border-radius: 16px;
+      padding: 6px 8px;
       font-weight: 900;
       box-shadow: 0 3px 8px rgba(0,0,0,0.1);
       border: 3px solid currentColor;
@@ -284,9 +292,9 @@
     }
 
     .fixed-score-point {
-      font-size: 25px;
+      font-size: 23px;
       line-height: 1;
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     .fixed-score-item.active-team {
@@ -294,79 +302,110 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
 
+    .top-actions {
+      max-width: 390px;
+      margin: 2px auto 4px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
     .icon-button {
-      width: 52px;
-      height: 52px;
+      width: 50px;
+      height: 50px;
       padding: 0;
       border-radius: 50%;
-      font-size: 25px;
+      font-size: 24px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       background: rgba(255,255,255,0.95);
       color: #263128;
       border: 2px solid #ccd5c5;
+      box-shadow: 0 5px 0 rgba(0,0,0,0.16);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      text-decoration: none;
+      overflow: hidden;
+      cursor: pointer;
     }
 
-    .top-actions {
-      max-width: 400px;
-      margin: -4px auto 6px;
+    .official-button img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .team-header-row {
       display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      position: relative;
-      z-index: 1;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
     }
 
     .team-name {
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 900;
-      margin: 8px 0;
-    }
-
-    .score {
-      font-size: 62px;
-      font-weight: 950;
-      margin: 2px 0 8px;
-      line-height: 1;
+      margin: 0;
+      text-align: left;
+      flex: 1;
+      min-width: 0;
     }
 
     .target {
       display: inline-block;
-      padding: 7px 14px;
+      padding: 7px 12px;
       border-radius: 999px;
       background: #f1f4ed;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 15px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .score {
+      font-size: 58px;
+      font-weight: 950;
+      margin: 2px 0 4px;
+      line-height: 1;
     }
 
     .score-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      max-width: 380px;
-      margin: 14px auto;
+      gap: 9px;
+      max-width: 340px;
+      margin: 12px auto;
       position: relative;
       z-index: 1;
     }
 
     .score-buttons button {
-      width: 62px;
-      height: 62px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
       margin: 0 auto;
       padding: 0;
-      font-size: 23px;
+      font-size: 22px;
       background: rgba(255,255,255,0.96);
       color: #263128;
       border: 4px solid currentColor;
       box-shadow: 0 6px 0 rgba(0,0,0,0.14);
     }
 
+    .score-buttons .zero-button {
+      grid-column: 2 / span 2;
+      justify-self: center;
+    }
+
     .status {
-      font-size: 17px;
-      margin-top: 8px;
-      min-height: 24px;
+      font-size: 16px;
+      margin-top: 6px;
+      min-height: 22px;
       font-weight: 800;
       position: relative;
       z-index: 1;
@@ -382,7 +421,7 @@
 
     @keyframes bump {
       0% { transform: scale(1); }
-      45% { transform: scale(1.04) rotate(-1deg); }
+      45% { transform: scale(1.035) rotate(-1deg); }
       100% { transform: scale(1); }
     }
 
@@ -428,41 +467,60 @@
 
     @media (max-width: 420px) {
       h1 {
-        font-size: 29px;
-        margin-top: 16px;
+        font-size: 28px;
+        margin-top: 10px;
+      }
+
+      .screen {
+        padding: 12px 14px;
+      }
+
+      .fixed-score-header {
+        margin: -12px -14px 7px;
       }
 
       .card {
-        max-width: 360px;
-        padding: 16px;
-        margin: 12px auto;
+        max-width: 350px;
+        padding: 14px;
+        margin: 9px auto;
       }
 
       .team-name {
-        font-size: 28px;
+        font-size: 26px;
       }
 
       .score {
-        font-size: 58px;
+        font-size: 54px;
       }
 
       .score-buttons {
-        gap: 9px;
-        max-width: 340px;
+        gap: 8px;
+        max-width: 320px;
+        margin: 10px auto;
       }
 
       .score-buttons button {
-        width: 58px;
-        height: 58px;
-        font-size: 22px;
+        width: 54px;
+        height: 54px;
+        font-size: 21px;
       }
 
       .fixed-score-item {
-        min-width: 80px;
+        min-width: 76px;
       }
 
       .fixed-score-point {
-        font-size: 23px;
+        font-size: 22px;
+      }
+
+      .icon-button {
+        width: 48px;
+        height: 48px;
+      }
+
+      .official-button img {
+        width: 34px;
+        height: 34px;
       }
 
       .over-popup-card {
@@ -475,6 +533,61 @@
 
       .over-popup-text {
         font-size: 22px;
+      }
+    }
+
+    @media (max-height: 720px) {
+      .fixed-score-header {
+        padding: 6px 8px 7px;
+      }
+
+      h1 {
+        font-size: 25px;
+        margin: 7px 0 4px;
+      }
+
+      .top-actions {
+        margin: 0 auto 2px;
+      }
+
+      .icon-button {
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+      }
+
+      .official-button img {
+        width: 31px;
+        height: 31px;
+      }
+
+      .card {
+        padding: 12px;
+        margin: 7px auto;
+      }
+
+      .team-name {
+        font-size: 24px;
+      }
+
+      .score {
+        font-size: 48px;
+      }
+
+      .score-buttons {
+        gap: 7px;
+        margin: 8px auto;
+      }
+
+      .score-buttons button {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+      }
+
+      .status {
+        font-size: 14px;
+        min-height: 18px;
       }
     }
   </style>
@@ -492,7 +605,6 @@
   </div>
 
   <div id="appShell">
-    <!-- 設定画面 -->
     <div id="setupScreen" class="screen active">
       <h1>Let’s play Mölkky!</h1>
       <p class="subtitle">モルック得点管理</p>
@@ -515,7 +627,6 @@
       </div>
     </div>
 
-    <!-- ゲーム画面 -->
     <div id="gameScreen" class="screen">
       <div class="fixed-score-header">
         <div class="fixed-score-title">SCORE</div>
@@ -525,14 +636,27 @@
       <h1>Let’s play Mölkky!</h1>
 
       <div class="top-actions">
-        <button class="icon-button" onclick="undoScore()" title="1手戻す">↩︎</button>
-        <button class="icon-button" onclick="resetGame()" title="リセット">🔄</button>
+        <a
+          class="icon-button official-button"
+          href="https://molkky.jp/molkky/"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="モルック公式HP"
+          aria-label="モルック公式HP"
+        >
+          <img src="molkky13.png" alt="公式HP" />
+        </a>
+
+        <button class="icon-button" onclick="undoScore()" title="1手戻す" aria-label="1手戻す">↩️</button>
+        <button class="icon-button" onclick="resetGame()" title="リセット" aria-label="リセット">🔄</button>
       </div>
 
       <div id="teamCard" class="card team-card">
-        <div id="currentTeam" class="team-name">チームA</div>
+        <div class="team-header-row">
+          <div id="currentTeam" class="team-name">チームA</div>
+          <div id="targetText" class="target">目標：50点</div>
+        </div>
         <div id="currentScore" class="score">0</div>
-        <div id="targetText" class="target">目標：50点</div>
       </div>
 
       <div class="score-buttons" id="scoreButtons"></div>
@@ -540,7 +664,6 @@
       <div id="status" class="status"></div>
     </div>
 
-    <!-- 勝利画面 -->
     <div id="winnerScreen" class="screen">
       <h1>Let’s play Mölkky!</h1>
 
@@ -603,12 +726,18 @@
       const area = document.getElementById("scoreButtons");
       area.innerHTML = "";
 
-      for (let i = 0; i <= 12; i++) {
+      for (let i = 1; i <= 12; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
         btn.onclick = () => addScore(i);
         area.appendChild(btn);
       }
+
+      const zeroBtn = document.createElement("button");
+      zeroBtn.textContent = 0;
+      zeroBtn.className = "zero-button";
+      zeroBtn.onclick = () => addScore(0);
+      area.appendChild(zeroBtn);
     }
 
     function addScore(points) {
@@ -893,7 +1022,7 @@
         img.style.width = size + "px";
         img.style.left = x + "px";
         img.style.top = y + "px";
-        img.style.opacity = (Math.random() * 0.04 + 0.07).toFixed(2);
+        img.style.opacity = (Math.random() * 0.05 + 0.15).toFixed(2);
         img.style.transform = `rotate(${randomInt(-28, 28)}deg)`;
         container.appendChild(img);
       });
@@ -902,14 +1031,6 @@
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-
-    let resizeTimer = null;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        createBackgroundPattern();
-      }, 180);
-    });
 
     window.addEventListener("load", () => {
       createBackgroundPattern();
